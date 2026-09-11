@@ -15,7 +15,7 @@ Commands:
   use     Switch to a configured provider by ID
 
 Apps:
-  claude, claude-desktop, codex, gemini, grokbuild, opencode, openclaw, hermes
+  claude, claude-desktop, codex, gemini, grokbuild, opencode, openclaw, hermes, pi
 
 Options:
   -h, --help       Show this help
@@ -205,6 +205,14 @@ mod tests {
     }
 
     #[test]
+    fn parses_pi_app_added_in_cc_switch_3_20() {
+        assert_eq!(
+            parse_args(args(&["list", "pi"])).ok(),
+            Some(Command::List { app: AppType::Pi })
+        );
+    }
+
+    #[test]
     fn rejects_missing_use_argument() {
         assert!(matches!(
             parse_args(args(&["use", "codex"])),
@@ -217,6 +225,20 @@ mod tests {
         assert!(matches!(
             parse_args(args(&["list", "unknown"])),
             Err(CliError::Usage(_))
+        ));
+    }
+
+    #[test]
+    fn rejects_unknown_provider_id() {
+        let db = Arc::new(Database::memory().expect("create in-memory database"));
+        let state = AppState::new(db);
+
+        let error = switch_provider(&state, AppType::Codex, "missing-provider")
+            .expect_err("unknown provider should fail");
+
+        assert!(matches!(
+            error,
+            CliError::Runtime(message) if message.contains("missing-provider")
         ));
     }
 
