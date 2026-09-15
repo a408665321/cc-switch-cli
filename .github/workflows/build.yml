@@ -104,7 +104,7 @@ jobs:
       - name: Build Windows installers
         if: runner.os == 'Windows'
         shell: pwsh
-        run: pnpm tauri build --bundles msi,nsis --config '{"bundle":{"createUpdaterArtifacts":false}}'
+        run: pnpm tauri build --bundles "msi,nsis" --config '{"bundle":{"createUpdaterArtifacts":false}}'
 
       - name: Build Linux packages
         if: runner.os == 'Linux'
