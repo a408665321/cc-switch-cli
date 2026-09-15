@@ -93,7 +93,9 @@ jobs:
             ~/.cargo/git
             src-tauri/target
           key: ${{ runner.os }}-cargo-build-${{ hashFiles('src-tauri/Cargo.lock') }}
-          restore-keys: ${{ runner.os }}-cargo-build-
+          restore-keys: |
+            ${{ runner.os }}-cargo-build-
+            ${{ runner.os }}-cargo-
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -104,7 +106,7 @@ jobs:
       - name: Build Windows installers
         if: runner.os == 'Windows'
         shell: pwsh
-        run: pnpm tauri build --bundles "msi,nsis" --config '{"bundle":{"createUpdaterArtifacts":false}}'
+        run: pnpm tauri build --bundles nsis --config '{"bundle":{"createUpdaterArtifacts":false}}'
 
       - name: Build Linux packages
         if: runner.os == 'Linux'
@@ -121,9 +123,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.artifact }}
-          path: |
-            src-tauri/target/release/bundle/msi/*.msi
-            src-tauri/target/release/bundle/nsis/*.exe
+          path: src-tauri/target/release/bundle/nsis/*.exe
           if-no-files-found: error
           retention-days: 14
 
